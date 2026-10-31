@@ -173,13 +173,21 @@ export default function SupervisorEvaluationView({ defaultHalaqahId }) {
     setSaving(true);
     setSaveSuccess(false);
     try {
+      const cleanScores = (scores) => {
+        const out = {};
+        for (const k in scores) {
+          out[k] = scores[k] === '' ? 0 : Number(scores[k]) || 0;
+        }
+        return out;
+      };
+
       const res = await api.post('/supervisor-evaluations', {
         halaqahId: selectedHalaqahId,
         monthYear,
         visitDate,
-        adminScores,
-        scientificScores,
-        professionalScores,
+        adminScores: cleanScores(adminScores),
+        scientificScores: cleanScores(scientificScores),
+        professionalScores: cleanScores(professionalScores),
         positives,
         negatives,
         recommendations,
@@ -432,8 +440,9 @@ export default function SupervisorEvaluationView({ defaultHalaqahId }) {
                       type="number"
                       min={0}
                       max={item.max}
-                      value={adminScores[item.key] ?? item.max}
-                      onChange={(e) => setAdminScores({ ...adminScores, [item.key]: Number(e.target.value) })}
+                      value={adminScores[item.key] !== undefined ? adminScores[item.key] : item.max}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setAdminScores({ ...adminScores, [item.key]: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-14 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-teal-500"
                     />
                     <span className="text-xs text-slate-400">/{item.max}</span>
@@ -478,8 +487,9 @@ export default function SupervisorEvaluationView({ defaultHalaqahId }) {
                       type="number"
                       min={0}
                       max={item.max}
-                      value={scientificScores[item.key] ?? item.max}
-                      onChange={(e) => setScientificScores({ ...scientificScores, [item.key]: Number(e.target.value) })}
+                      value={scientificScores[item.key] !== undefined ? scientificScores[item.key] : item.max}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setScientificScores({ ...scientificScores, [item.key]: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-14 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-teal-500"
                     />
                     <span className="text-xs text-slate-400">/{item.max}</span>
@@ -524,8 +534,9 @@ export default function SupervisorEvaluationView({ defaultHalaqahId }) {
                       type="number"
                       min={0}
                       max={item.max}
-                      value={professionalScores[item.key] ?? item.max}
-                      onChange={(e) => setProfessionalScores({ ...professionalScores, [item.key]: Number(e.target.value) })}
+                      value={professionalScores[item.key] !== undefined ? professionalScores[item.key] : item.max}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setProfessionalScores({ ...professionalScores, [item.key]: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-14 px-2 py-1 bg-white border border-slate-200 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-teal-500"
                     />
                     <span className="text-xs text-slate-400">/{item.max}</span>

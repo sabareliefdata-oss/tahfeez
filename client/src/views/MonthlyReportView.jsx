@@ -161,10 +161,35 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
     setSaving(true);
     setSaveSuccess(false);
     try {
+      const cleanedEntries = studentEntries.map(e => ({
+        ...e,
+        currentMemorizedParts: e.currentMemorizedParts === '' ? (e.openingMemorizedParts || 0) : Number(e.currentMemorizedParts),
+        planMemorization: {
+          ...e.planMemorization,
+          pagesCount: e.planMemorization?.pagesCount === '' ? 0 : Number(e.planMemorization?.pagesCount) || 0
+        },
+        actualMemorization: {
+          ...e.actualMemorization,
+          pagesCount: e.actualMemorization?.pagesCount === '' ? 0 : Number(e.actualMemorization?.pagesCount) || 0
+        },
+        actualRevision: {
+          ...e.actualRevision,
+          pagesCount: e.actualRevision?.pagesCount === '' ? 0 : Number(e.actualRevision?.pagesCount) || 0
+        },
+        testScores: {
+          memorization: e.testScores?.memorization === '' ? 0 : Number(e.testScores?.memorization) || 0,
+          recitation: e.testScores?.recitation === '' ? 0 : Number(e.testScores?.recitation) || 0,
+          performance: e.testScores?.performance === '' ? 0 : Number(e.testScores?.performance) || 0,
+          lessons: e.testScores?.lessons === '' ? 0 : Number(e.testScores?.lessons) || 0,
+          attendance: e.testScores?.attendance === '' ? 0 : Number(e.testScores?.attendance) || 0,
+          behavior: e.testScores?.behavior === '' ? 0 : Number(e.testScores?.behavior) || 0
+        }
+      }));
+
       await api.post('/monthly-reports', {
         halaqahId: selectedHalaqahId,
         monthYear,
-        studentEntries,
+        studentEntries: cleanedEntries,
         generalNotes,
         status: 'submitted'
       });
@@ -489,8 +514,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           type="number"
                           min={0}
                           max={30}
-                          value={entry.currentMemorizedParts !== undefined ? entry.currentMemorizedParts : (entry.openingMemorizedParts || 0)}
-                          onChange={(e) => updateStudentEntry(index, 'currentMemorizedParts', Number(e.target.value))}
+                          value={entry.currentMemorizedParts !== undefined ? entry.currentMemorizedParts : (entry.openingMemorizedParts ?? 0)}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => updateStudentEntry(index, 'currentMemorizedParts', e.target.value === '' ? '' : Number(e.target.value))}
                           className="w-20 px-3 py-1.5 bg-white border border-emerald-300 rounded-xl text-center font-bold text-emerald-950 text-sm focus:ring-2 focus:ring-emerald-500 shadow-xs"
                         />
                         <span className="text-xs font-bold text-emerald-900">أجزاء</span>
@@ -601,8 +627,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <label className="text-[10px] text-slate-500 block mb-0.5">صفحات الخطة</label>
                           <input
                             type="number"
-                            value={entry.planMemorization?.pagesCount || 0}
-                            onChange={(e) => updateStudentEntry(index, 'planMemorization.pagesCount', Number(e.target.value))}
+                            value={entry.planMemorization?.pagesCount !== undefined ? entry.planMemorization.pagesCount : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'planMemorization.pagesCount', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-center font-bold"
                           />
                         </div>
@@ -633,8 +660,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <label className="text-[10px] text-emerald-800 font-semibold block mb-0.5">صفحات الحفظ</label>
                           <input
                             type="number"
-                            value={entry.actualMemorization?.pagesCount || 0}
-                            onChange={(e) => updateStudentEntry(index, 'actualMemorization.pagesCount', Number(e.target.value))}
+                            value={entry.actualMemorization?.pagesCount !== undefined ? entry.actualMemorization.pagesCount : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'actualMemorization.pagesCount', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-2 py-1.5 bg-emerald-50/50 border border-emerald-200 rounded-lg text-xs text-center font-bold"
                           />
                         </div>
@@ -659,8 +687,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <label className="text-[10px] text-slate-500 block mb-0.5">عدد صفحات المراجعة</label>
                           <input
                             type="number"
-                            value={entry.actualRevision?.pagesCount || 0}
-                            onChange={(e) => updateStudentEntry(index, 'actualRevision.pagesCount', Number(e.target.value))}
+                            value={entry.actualRevision?.pagesCount !== undefined ? entry.actualRevision.pagesCount : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'actualRevision.pagesCount', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-center font-bold"
                           />
                         </div>
@@ -711,8 +740,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={45}
-                            value={entry.testScores?.memorization || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.memorization', Number(e.target.value))}
+                            value={entry.testScores?.memorization !== undefined ? entry.testScores.memorization : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.memorization', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-xs"
                           />
                         </div>
@@ -721,8 +751,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={20}
-                            value={entry.testScores?.recitation || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.recitation', Number(e.target.value))}
+                            value={entry.testScores?.recitation !== undefined ? entry.testScores.recitation : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.recitation', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-xs"
                           />
                         </div>
@@ -731,8 +762,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={10}
-                            value={entry.testScores?.performance || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.performance', Number(e.target.value))}
+                            value={entry.testScores?.performance !== undefined ? entry.testScores.performance : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.performance', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-xs"
                           />
                         </div>
@@ -741,8 +773,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={10}
-                            value={entry.testScores?.lessons || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.lessons', Number(e.target.value))}
+                            value={entry.testScores?.lessons !== undefined ? entry.testScores.lessons : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.lessons', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-xs"
                           />
                         </div>
@@ -751,8 +784,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={10}
-                            value={entry.testScores?.attendance || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.attendance', Number(e.target.value))}
+                            value={entry.testScores?.attendance !== undefined ? entry.testScores.attendance : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.attendance', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-xs"
                           />
                         </div>
@@ -761,8 +795,9 @@ export default function MonthlyReportView({ defaultHalaqahId }) {
                           <input
                             type="number"
                             max={5}
-                            value={entry.testScores?.behavior || 0}
-                            onChange={(e) => updateStudentEntry(index, 'testScores.behavior', Number(e.target.value))}
+                            value={entry.testScores?.behavior !== undefined ? entry.testScores.behavior : ''}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateStudentEntry(index, 'testScores.behavior', e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full px-1 py-1.5 bg-emerald-50 border border-emerald-300 rounded-lg text-center font-bold text-xs text-emerald-950"
                           />
                         </div>
