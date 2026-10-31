@@ -4,7 +4,7 @@
   "description": "نظام حِفظ - منظومة متابعة وإدارة حلقات تحفيظ القرآن الكريم - مؤسسة سبأ للإغاثة والتنمية",
   "main": "server/server.js",
   "scripts": {
-    "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server",
+    "build": "npm install --include=dev --prefix client && npm run build --prefix client && npm install --prefix server",
     "start": "node server/server.js"
   },
   "engines": {
